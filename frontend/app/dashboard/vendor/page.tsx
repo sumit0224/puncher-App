@@ -55,7 +55,7 @@ export default function VendorDashboard() {
 
     return (
         <DashboardLayout role="vendor">
-            <div className="space-y-8">
+            <div className="space-y-8 text-black">
                 {/* Status Bar */}
                 <Card className={`${isOnline ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
                     <CardContent className="flex items-center justify-between p-6">

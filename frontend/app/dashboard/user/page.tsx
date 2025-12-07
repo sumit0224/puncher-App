@@ -45,7 +45,7 @@ export default function UserDashboard() {
 
     return (
         <DashboardLayout role="user">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 text-black lg:grid-cols-3 gap-8">
                 {/* Left Column: Request Service */}
                 <div className="lg:col-span-1 space-y-6">
                     <h2 className="text-2xl font-bold">New Request</h2>

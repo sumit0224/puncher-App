@@ -54,7 +54,7 @@ export default function RegisterUser() {
             title="Join the Network."
             subtitle="Create your account to request roadside assistance instantly."
         >
-            <div className="space-y-6">
+            <div className="space-y-6 text-black">
                 <div className="space-y-2 text-center lg:text-left">
                     <h2 className="text-3xl font-bold tracking-tight">Create Account</h2>
                     <p className="text-gray-500">Enter your details to get started.</p>
