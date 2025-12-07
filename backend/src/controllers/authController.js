@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const { generateToken } = require('../utils/token');
 
 const prisma = new PrismaClient();
+console.log(prisma);
 const SALT_ROUNDS = 10;
 
 const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -64,7 +65,9 @@ const registerUser = async (req, res) => {
             email: user.email,
             token,
         });
+        return res.status(500).json({ message: 'Server error' });
     } catch (error) {
+        console.error('Register User Error:', error);
         if (error?.code === 'P2002') {
             const conflictField = error?.meta?.target?.join(', ') || 'field';
             return res.status(409).json({ message: `Unique constraint failed: ${conflictField}` });
@@ -99,6 +102,7 @@ const loginUser = async (req, res) => {
 
         return res.status(401).json({ message: 'Invalid phone or password' });
     } catch (error) {
+        console.error('Login User Error:', error);
         return res.status(500).json({ message: 'Server error' });
     }
 };
@@ -154,7 +158,9 @@ const registerVendor = async (req, res) => {
             shopName: vendor.shopName,
             token,
         });
+        return res.status(500).json({ message: 'Server error' });
     } catch (error) {
+        console.error('Register Vendor Error:', error);
         if (error?.code === 'P2002') {
             const conflictField = error?.meta?.target?.join(', ') || 'field';
             return res.status(409).json({ message: `Unique constraint failed: ${conflictField}` });
@@ -189,6 +195,7 @@ const loginVendor = async (req, res) => {
 
         return res.status(401).json({ message: 'Invalid phone or password' });
     } catch (error) {
+        console.error('Login Vendor Error:', error);
         return res.status(500).json({ message: 'Server error' });
     }
 };
