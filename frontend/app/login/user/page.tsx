@@ -54,7 +54,7 @@ export default function UserLogin() {
             title="Welcome Back."
             subtitle="Login to access your dashboard and request assistance."
         >
-            <div className="space-y-6">
+            <div className="space-y-6 text-black">
                 <div className="space-y-2 text-center lg:text-left">
                     <h2 className="text-3xl font-bold tracking-tight">Login</h2>
                     <p className="text-gray-500">Enter your phone number and password.</p>
@@ -73,7 +73,7 @@ export default function UserLogin() {
                             value={formData.phone}
                             onChange={handleChange}
                             required
-                            className="h-12 bg-gray-50 border-gray-200 focus:ring-yellow-400 focus:border-yellow-400"
+                            className="h-12 bg-white border-gray-300 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all shadow-sm"
                         />
                     </div>
 
@@ -92,7 +92,7 @@ export default function UserLogin() {
                             value={formData.password}
                             onChange={handleChange}
                             required
-                            className="h-12 bg-gray-50 border-gray-200 focus:ring-yellow-400 focus:border-yellow-400"
+                            className="h-12 bg-white border-gray-300 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all shadow-sm"
                         />
                     </div>
 

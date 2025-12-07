@@ -72,7 +72,7 @@ export default function RegisterUser() {
                             value={formData.name}
                             onChange={handleChange}
                             required
-                            className="h-12 bg-gray-50 border-gray-200 focus:ring-yellow-400 focus:border-yellow-400"
+                            className="h-12 bg-white border-gray-300 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all shadow-sm"
                         />
                     </div>
 
@@ -87,7 +87,7 @@ export default function RegisterUser() {
                             placeholder="name@example.com"
                             value={formData.email}
                             onChange={handleChange}
-                            className="h-12 bg-gray-50 border-gray-200 focus:ring-yellow-400 focus:border-yellow-400"
+                            className="h-12 bg-white border-gray-300 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all shadow-sm"
                         />
                     </div>
 
@@ -103,7 +103,7 @@ export default function RegisterUser() {
                             value={formData.phone}
                             onChange={handleChange}
                             required
-                            className="h-12 bg-gray-50 border-gray-200 focus:ring-yellow-400 focus:border-yellow-400"
+                            className="h-12 bg-white border-gray-300 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all shadow-sm"
                         />
                     </div>
 
@@ -119,7 +119,7 @@ export default function RegisterUser() {
                             value={formData.password}
                             onChange={handleChange}
                             required
-                            className="h-12 bg-gray-50 border-gray-200 focus:ring-yellow-400 focus:border-yellow-400"
+                            className="h-12 bg-white border-gray-300 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all shadow-sm"
                         />
                     </div>
 

@@ -44,8 +44,8 @@ export default function RegisterVendor() {
             title="Grow Your Business."
             subtitle="Partner with Puncher and get more customers for your garage."
         >
-            <div className="space-y-6">
-                <div className="space-y-2 text-center lg:text-left">
+            <div className="space-y-6 text-black">
+                <div className="space-y-2  text-center lg:text-left">
                     <h2 className="text-3xl font-bold tracking-tight">Vendor Registration</h2>
                     <p className="text-gray-500">Join our network of verified mechanics.</p>
                 </div>
@@ -62,7 +62,7 @@ export default function RegisterVendor() {
                             value={formData.name}
                             onChange={handleChange}
                             required
-                            className="h-12 bg-gray-50 border-gray-200 focus:ring-yellow-400 focus:border-yellow-400"
+                            className="h-12 bg-white border-gray-300 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all shadow-sm"
                         />
                     </div>
 
@@ -76,7 +76,7 @@ export default function RegisterVendor() {
                             placeholder="e.g. Ramu Auto Works"
                             value={formData.shopName}
                             onChange={handleChange}
-                            className="h-12 bg-gray-50 border-gray-200 focus:ring-yellow-400 focus:border-yellow-400"
+                            className="h-12 bg-white border-gray-300 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all shadow-sm"
                         />
                     </div>
 
@@ -92,7 +92,7 @@ export default function RegisterVendor() {
                             value={formData.phone}
                             onChange={handleChange}
                             required
-                            className="h-12 bg-gray-50 border-gray-200 focus:ring-yellow-400 focus:border-yellow-400"
+                            className="h-12 bg-white border-gray-300 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all shadow-sm"
                         />
                     </div>
 
@@ -108,7 +108,7 @@ export default function RegisterVendor() {
                             value={formData.password}
                             onChange={handleChange}
                             required
-                            className="h-12 bg-gray-50 border-gray-200 focus:ring-yellow-400 focus:border-yellow-400"
+                            className="h-12 bg-white border-gray-300 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all shadow-sm"
                         />
                     </div>
 

@@ -53,7 +53,7 @@ export default function VendorLogin() {
             title="Partner Login."
             subtitle="Access your mechanic dashboard to manage service requests."
         >
-            <div className="space-y-6">
+            <div className="space-y-6 text-black">
                 <div className="space-y-2 text-center lg:text-left">
                     <h2 className="text-3xl font-bold tracking-tight">Welcome Back</h2>
                     <p className="text-gray-500">Log in to manage your workshop.</p>
@@ -72,7 +72,7 @@ export default function VendorLogin() {
                             value={formData.phone}
                             onChange={handleChange}
                             required
-                            className="h-12 bg-gray-50 border-gray-200 focus:ring-yellow-400 focus:border-yellow-400"
+                            className="h-12 bg-white border-gray-300 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all shadow-sm"
                         />
                     </div>
 
@@ -90,7 +90,7 @@ export default function VendorLogin() {
                             value={formData.password}
                             onChange={handleChange}
                             required
-                            className="h-12 bg-gray-50 border-gray-200 focus:ring-yellow-400 focus:border-yellow-400"
+                            className="h-12 bg-white border-gray-300 focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all shadow-sm"
                         />
                     </div>
 
