@@ -14,7 +14,12 @@ const PORT = process.env.PORT || 5000;
 // Init Socket.IO
 initIO(server);
 
-app.use(cors());
+app.use(cors(
+  {
+    origin: 'https://puncher-app.vercel.app',
+    credentials: true,
+  }
+));
 app.use(express.json());
 
 const authRoutes = require('./src/routes/authRoutes');
