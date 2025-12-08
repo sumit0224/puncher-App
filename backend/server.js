@@ -16,7 +16,7 @@ initIO(server);
 
 app.use(cors(
   {
-    origin: 'https://puncher-app.onrender.com',
+    origin: 'https://puncher-app.vercel.app',
     credentials: true,
 
   }
