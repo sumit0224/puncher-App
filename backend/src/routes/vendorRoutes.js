@@ -15,7 +15,6 @@ router.put('/profile', protect, vendorOnly, updateVendorProfile);
 router.put('/location', protect, vendorOnly, updateLocation);
 router.put('/status', protect, vendorOnly, toggleStatus);
 
-// Upload KYC: Expects fields like 'aadhar', 'pan'
 router.post(
     '/kyc',
     protect,

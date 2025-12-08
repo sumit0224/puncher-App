@@ -1,8 +1,5 @@
 const Vendor = require('../models/Vendor');
 
-// @desc    Get vendor profile
-// @route   GET /api/vendors/profile
-// @access  Private (Vendor)
 const getVendorProfile = async (req, res) => {
     try {
         const vendor = await Vendor.findById(req.user.id).select('-passwordHash');
@@ -26,9 +23,6 @@ const getVendorProfile = async (req, res) => {
     }
 };
 
-// @desc    Update vendor profile (incl. simple fields)
-// @route   PUT /api/vendors/profile
-// @access  Private (Vendor)
 const updateVendorProfile = async (req, res) => {
     const { name, shopName, serviceTypes, bankInfo } = req.body;
 
@@ -38,7 +32,7 @@ const updateVendorProfile = async (req, res) => {
             {
                 name,
                 shopName,
-                serviceTypes, // ensure frontend sends array
+                serviceTypes,
                 bankInfo
             },
             { new: true, select: 'id name shopName serviceTypes' }
@@ -50,12 +44,8 @@ const updateVendorProfile = async (req, res) => {
     }
 };
 
-// @desc    Update vendor location
-// @route   PUT /api/vendors/location
-// @access  Private (Vendor)
 const updateLocation = async (req, res) => {
     const { lat, long } = req.body;
-    // location stored as "lat,long" string
     const location = `${lat},${long}`;
 
     try {
@@ -73,9 +63,6 @@ const updateLocation = async (req, res) => {
     }
 };
 
-// @desc    Upload KYC documents
-// @route   POST /api/vendors/kyc
-// @access  Private (Vendor)
 const uploadKYC = async (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).json({ message: 'No files uploaded' });
@@ -110,9 +97,6 @@ const uploadKYC = async (req, res) => {
 };
 
 
-// @desc    Toggle vendor status (Online/Offline)
-// @route   PUT /api/vendors/status
-// @access  Private (Vendor)
 const toggleStatus = async (req, res) => {
     try {
         const vendor = await Vendor.findById(req.user.id);

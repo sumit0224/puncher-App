@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-// Prisma Removed
 
 const protect = async (req, res, next) => {
     let token;
@@ -12,7 +11,7 @@ const protect = async (req, res, next) => {
             token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-            req.user = decoded; // { id, role }
+            req.user = decoded;
             next();
         } catch (error) {
             console.error(error);
@@ -34,8 +33,6 @@ const vendorOnly = (req, res, next) => {
 };
 
 const adminOnly = (req, res, next) => {
-    // Basic admin check - for now assuming role is stored or admin user defined
-    // Extending logic to check role
     if (req.user && req.user.role === 'admin') {
         next();
     } else {

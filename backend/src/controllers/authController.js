@@ -95,7 +95,7 @@ const loginUser = async (req, res) => {
 
 const registerVendor = async (req, res) => {
     try {
-        const { name, phone, shopName, password } = req.body;
+        const { name, phone, shopName, password, serviceTypes } = req.body;
 
         if (!name || !phone || !shopName || !password) {
             return res.status(422).json({ message: 'All fields are required' });
@@ -118,11 +118,17 @@ const registerVendor = async (req, res) => {
 
         const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
 
+        // Defaulting serviceTypes if not provided for MVP friendliness
+        const services = serviceTypes || ['Puncture', 'Towing', 'Mechanic'];
+
         const vendor = await Vendor.create({
             name: name.trim(),
             phone: normalizedPhone,
             shopName: shopName.trim(),
             passwordHash,
+            serviceTypes: services,
+            isVerified: true, // Auto-verify for MVP
+            isActive: false // Vendor must still go online manually
         });
 
         const token = generateToken(vendor._id, 'vendor');

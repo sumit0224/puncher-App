@@ -21,25 +21,16 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     const [isConnected, setIsConnected] = useState(false);
 
     useEffect(() => {
-        // Only connect if we have a token (user logged in) or logic permits
-        // For now, we connect and let the socket handle auth or rooms later
-        // Or we can connect once on mount.
-
-        // Ensure we point to the backend URL
-        const socketUrl = 'http://localhost:5000'; // Make this env var aware if needed
+        const socketUrl = process.env.NEXT_PUBLIC_API_URL ? new URL(process.env.NEXT_PUBLIC_API_URL).origin : 'http://localhost:5000';
         const newSocket = io(socketUrl, {
-            // options if needed
         });
 
         newSocket.on('connect', () => {
             console.log('Socket connected:', newSocket.id);
             setIsConnected(true);
 
-            // Auto-join room based on user role/id if token exists
             const token = localStorage.getItem('token');
             if (token) {
-                // We need to decode token or fetch profile to know who we are
-                // Alternatively, fetch profile then emit join
                 joinRoom(newSocket);
             }
         });
@@ -61,15 +52,6 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
             const token = localStorage.getItem('token');
             if (!token) return;
 
-            // We can reuse the profile endpoint or decode JWT here. 
-            // For simplicity, let's fetch profile.
-            // Note: This might be redundant if we already have user data in a UserContext.
-            // But this ensures independent socket logic.
-
-            // Check if vendor or user based on current path or just try both endpoints?
-            // Better: Decode token if possible, or just try to get profile.
-
-            // Let's try getting user profile first
             try {
                 const user = await api.get<any>('/auth/profile', { 'Authorization': `Bearer ${token}` });
                 if (user && user.id) {

@@ -1,51 +1,36 @@
 const Job = require('../models/Job');
 const Vendor = require('../models/Vendor');
 const { getIO } = require('../socket');
+const { initiateJobSearch } = require('../services/jobSearchService');
+const { TOTAL_TIMEOUT } = require('../config/config');
 
-// Simple distance calculation
-const findNearbyVendors = async (lat, long, serviceType) => {
-    const vendors = await Vendor.find({
-        isActive: true,
-        isVerified: true,
-        serviceTypes: serviceType // mongoose checks if array contains value
-    });
+// Helper for finding nearby vendors explicitly removed or moved to service. 
+// However, the user might hit endpoints unrelated to search service?
+// "findNearbyVendors" was internal to createRequest. It is now handled by initiateJobSearch.
+// We can keep it or remove it. I will remove it as the logic moved to service.
 
-    return vendors.filter(v => {
-        if (!v.currentLocation) return false;
-        const [vLat, vLong] = v.currentLocation.split(',').map(Number);
-        const dist = Math.sqrt(Math.pow(vLat - lat, 2) + Math.pow(vLong - long, 2));
-        return dist < 0.1;
-    });
-};
-
-// @desc    Create a service request
-// @route   POST /api/requests
-// @access  Private (User)
 const createRequest = async (req, res) => {
     const { serviceType, location, priceEstimate } = req.body;
     const userId = req.user.id;
 
     try {
-        const [lat, long] = location.split(',').map(Number);
+        const expiresAt = new Date(Date.now() + TOTAL_TIMEOUT);
 
         const newJob = await Job.create({
             userId,
             serviceType,
             location,
             priceEstimate,
-            status: 'REQUESTED'
+            status: 'REQUESTED',
+            expiresAt,
+            notifiedVendorIds: []
         });
 
-        // Find matches
-        const nearbyVendors = await findNearbyVendors(lat, long, serviceType);
+        // Initiate Async Search
+        initiateJobSearch(newJob.id);
 
-        // Notify Vendors via Socket
-        const io = getIO();
-        nearbyVendors.forEach(vendor => {
-            io.to(`vendor_${vendor.id}`).emit('new_job_request', newJob);
-        });
-
-        res.status(201).json({ job: newJob, nearbyCount: nearbyVendors.length });
+        // Immediate response
+        res.status(201).json({ job: newJob, message: 'Request started, searching for vendors...' });
 
     } catch (error) {
         console.error(error);
@@ -53,21 +38,14 @@ const createRequest = async (req, res) => {
     }
 };
 
-// @desc    Vendor accepts request
-// @route   POST /api/requests/:id/accept
-// @access  Private (Vendor)
 const acceptRequest = async (req, res) => {
-    const jobId = req.params.id; // String ID in mongoose
+    const jobId = req.params.id;
     const vendorId = req.user.id;
 
     try {
-        const job = await Job.findById(jobId);
-
-        if (!job) return res.status(404).json({ message: 'Job not found' });
-        if (job.status !== 'REQUESTED') return res.status(400).json({ message: 'Job already taken' });
-
-        const updatedJob = await Job.findByIdAndUpdate(
-            jobId,
+        // Atomic update: Only update if status is REQUESTED
+        const updatedJob = await Job.findOneAndUpdate(
+            { _id: jobId, status: 'REQUESTED' },
             {
                 vendorId,
                 status: 'ASSIGNED'
@@ -75,7 +53,14 @@ const acceptRequest = async (req, res) => {
             { new: true }
         ).populate('userId', 'name phone').populate('vendorId', 'name phone shopName');
 
-        // Notify User
+        if (!updatedJob) {
+            // Check why it failed
+            const job = await Job.findById(jobId);
+            if (!job) return res.status(404).json({ message: 'Job not found' });
+            if (job.status !== 'REQUESTED') return res.status(400).json({ message: `Job already ${job.status}` });
+            return res.status(400).json({ message: 'Unable to accept job' });
+        }
+
         const io = getIO();
         io.to(`user_${updatedJob.userId.id}`).emit('job_assigned', updatedJob);
 
@@ -87,9 +72,6 @@ const acceptRequest = async (req, res) => {
     }
 };
 
-// @desc    Update Job Status
-// @route   PUT /api/requests/:id/status
-// @access  Private (Vendor)
 const updateStatus = async (req, res) => {
     const jobId = req.params.id;
     const { status } = req.body;
@@ -110,9 +92,6 @@ const updateStatus = async (req, res) => {
     }
 };
 
-// @desc    Get user requests
-// @route   GET /api/requests/user
-// @access  Private (User)
 const getUserRequests = async (req, res) => {
     try {
         const jobs = await Job.find({ userId: req.user.id })
@@ -125,9 +104,6 @@ const getUserRequests = async (req, res) => {
     }
 };
 
-// @desc    Get vendor jobs (assigned)
-// @route   GET /api/requests/vendor
-// @access  Private (Vendor)
 const getVendorJobs = async (req, res) => {
     try {
         const jobs = await Job.find({ vendorId: req.user.id })

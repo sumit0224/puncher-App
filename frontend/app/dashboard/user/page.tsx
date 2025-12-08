@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import ServiceRequestForm from '@/components/dashboard/ServiceRequestForm';
 import ActiveJobsList from '@/components/dashboard/ActiveJobsList';
+import ServiceRequestForm from '@/components/dashboard/ServiceRequestForm';
 import { api } from '@/lib/api';
 import { useSocket } from '@/context/SocketContext';
 
@@ -22,7 +22,7 @@ export default function UserDashboard() {
         if (socket) {
             socket.on('job_assigned', (job: any) => {
                 alert(`Good news! A mechanic has accepted your request: ${job.serviceType}`);
-                fetchJobs(); // Update the list
+                fetchJobs();
             });
 
             socket.on('job_status_update', (job: any) => {
@@ -68,13 +68,11 @@ export default function UserDashboard() {
     return (
         <DashboardLayout role="user">
             <div className="grid grid-cols-1 text-black lg:grid-cols-3 gap-8">
-                {/* Left Column: Request Service */}
                 <div className="lg:col-span-1 space-y-6">
                     <h2 className="text-2xl font-bold">New Request</h2>
                     <ServiceRequestForm onSuccess={fetchJobs} />
                 </div>
 
-                {/* Right Column: Active Status */}
                 <div className="lg:col-span-2 space-y-6">
                     <h2 className="text-2xl font-bold">Your Activity</h2>
                     <ActiveJobsList jobs={jobs} userType="user" />

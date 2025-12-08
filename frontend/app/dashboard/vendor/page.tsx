@@ -23,7 +23,6 @@ export default function VendorDashboard() {
         if (socket) {
             socket.on('new_job_request', (job: any) => {
                 alert(`New Job Request: ${job.serviceType}`);
-                // Add the new job to the list immediately so it can be accepted
                 setJobs((prevJobs) => [job, ...prevJobs]);
             });
             return () => {
@@ -40,15 +39,6 @@ export default function VendorDashboard() {
                     'Authorization': `Bearer ${token}`
                 });
                 setVendor(vendorData);
-                // Assume vendorData has isActive field? 
-                // We didn't see it in the previous view_file of vendorController getProfile, 
-                // but the model has it. Let's assume the controller returns it or we fetch it.
-                // Actually the controller I viewed EARLIER did NOT return isActive explicitly in the JSON response?
-                // Let's check vendorController again or just fetch it. 
-                // Wait, I can see getVendorProfile in my context. It sends: 
-                // id, name, phone, shopName, serviceTypes, currentLocation, isVerified, documents, bankInfo.
-                // It does NOT send isActive. I should update getVendorProfile too or just rely on the toggle response.
-                // For now, let's assume default offline or fetch it.
             }
         } catch (error) {
             console.error("Failed to fetch vendor profile", error);
@@ -72,19 +62,25 @@ export default function VendorDashboard() {
     const toggleStatus = async () => {
         try {
             const token = localStorage.getItem('token');
+            const newStatus = !isOnline;
+
+            if (token && newStatus) {
+                await api.put('/vendors/location', { lat: 12.9716, long: 77.5946 }, {
+                    'Authorization': `Bearer ${token}`
+                });
+            }
+
             const data = await api.put<{ isActive: boolean }>('/vendors/status', {}, {
                 'Authorization': `Bearer ${token}`
             });
             setIsOnline(data.isActive);
+
         } catch (error) {
             console.error("Failed to toggle status", error);
             alert("Failed to toggle status");
         }
     };
 
-    // ... rest of render ...
-
-    // Accept Job Handler
     const acceptJob = async (jobId: string) => {
         try {
             const token = localStorage.getItem('token');
@@ -102,7 +98,6 @@ export default function VendorDashboard() {
     return (
         <DashboardLayout role="vendor">
             <div className="space-y-8 text-black">
-                {/* Status Bar */}
                 <Card className={`${isOnline ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
                     <CardContent className="flex items-center justify-between p-6">
                         <div>
@@ -129,7 +124,6 @@ export default function VendorDashboard() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div className="space-y-4">
                         <h3 className="text-xl font-semibold">Incoming Requests / Active Jobs</h3>
-                        {/* Merging lists for MVP or showing ActiveJobsList */}
                         <ActiveJobsList jobs={jobs} userType="vendor" />
                     </div>
                 </div>

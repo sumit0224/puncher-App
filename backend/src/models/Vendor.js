@@ -5,13 +5,13 @@ const vendorSchema = new mongoose.Schema({
     phone: { type: String, required: true, unique: true },
     shopName: { type: String },
     passwordHash: { type: String },
-    documents: { type: Object }, // Stores links to Aadhar, DL, PAN images
+    documents: { type: Object },
     bankInfo: { type: Object },
-    serviceTypes: [{ type: String }], // Array of strings
+    serviceTypes: [{ type: String }],
     ratingAvg: { type: Number, default: 5.0 },
     isVerified: { type: Boolean, default: false },
     isActive: { type: Boolean, default: false },
-    currentLocation: { type: String }, // "lat,long"
+    currentLocation: { type: String },
 }, { timestamps: true });
 
 vendorSchema.virtual('id').get(function () {

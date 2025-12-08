@@ -8,10 +8,12 @@ const jobSchema = new mongoose.Schema({
     finalPrice: { type: Number },
     status: {
         type: String,
-        enum: ['REQUESTED', 'ASSIGNED', 'ON_WAY', 'ARRIVED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'],
+        enum: ['REQUESTED', 'ASSIGNED', 'ON_WAY', 'ARRIVED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'TIMED_OUT'],
         default: 'REQUESTED'
     },
-    location: { type: String, required: true }, // "lat,long"
+    location: { type: String, required: true },
+    notifiedVendorIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Vendor' }],
+    expiresAt: { type: Date },
 }, { timestamps: true });
 
 jobSchema.virtual('id').get(function () {
