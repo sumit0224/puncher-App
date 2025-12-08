@@ -1,5 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const Payment = require('../models/Payment');
 
 // @desc    Create Payment Order (Razorpay Stub)
 // @route   POST /api/payments/order
@@ -12,20 +11,18 @@ const createOrder = async (req, res) => {
         const orderId = `order_${Date.now()}_stub`; // Mock ID
 
         // Create Payment record
-        const payment = await prisma.payment.create({
-            data: {
-                jobId,
-                userId: req.user.id,
-                amount,
-                method: method || 'ONLINE',
-                status: 'PENDING'
-            }
+        const payment = await Payment.create({
+            jobId,
+            userId: req.user.id,
+            amount,
+            method: method || 'ONLINE',
+            status: 'PENDING'
         });
 
         res.json({
             paymentId: payment.id,
             orderId: orderId,
-            amount: amount,
+            amount: amount, // check if mongoose stores as number
             currency: 'INR',
             key: 'TEST_KEY'
         });
@@ -45,16 +42,21 @@ const paymentCallback = async (req, res) => {
     try {
         // In real app, verify signature
 
-        const payment = await prisma.payment.update({
-            where: { jobId: parseInt(jobId) }, // Assuming 1:1 job:payment
-            data: {
+        // Assuming 1:1 job:payment. JobID might need to be cast to ObjectId if stored as Ref, 
+        // but here we might have stored it as string/Ref. 
+        // If Payment.jobId is ObjectId, we need to query by it.
+        // Assuming jobId passed in body is the string representation.
+
+        const payment = await Payment.findOneAndUpdate(
+            { jobId: jobId },
+            {
                 status: status === 'success' ? 'COMPLETED' : 'FAILED'
-            }
-        });
+            },
+            { new: true }
+        );
 
         if (status === 'success') {
             // Update Job to completed? Or keep it separate?
-            // Usually payment happens after service
         }
 
         res.json({ status: 'ok' });

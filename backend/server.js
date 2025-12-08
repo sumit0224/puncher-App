@@ -3,7 +3,7 @@ dotenv.config();
 
 const express = require('express');
 const cors = require('cors');
-
+const mongoose = require('mongoose');
 const http = require('http');
 const { initIO } = require('./src/socket');
 
@@ -16,11 +16,16 @@ initIO(server);
 
 app.use(cors(
   {
-    origin: 'https://puncher-app.vercel.app',
+    origin: 'http://localhost:3000',
     credentials: true,
   }
 ));
 app.use(express.json());
+
+// Database Connection
+mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/puncher')
+  .then(() => console.log('MongoDB Connected'))
+  .catch(err => console.log('MongoDB Connection Error:', err));
 
 const authRoutes = require('./src/routes/authRoutes');
 const vendorRoutes = require('./src/routes/vendorRoutes');
