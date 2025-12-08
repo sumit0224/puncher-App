@@ -5,6 +5,7 @@ const {
     updateVendorProfile,
     updateLocation,
     uploadKYC,
+    toggleStatus
 } = require('../controllers/vendorController');
 const { protect, vendorOnly } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
@@ -12,6 +13,7 @@ const upload = require('../middleware/uploadMiddleware');
 router.get('/profile', protect, vendorOnly, getVendorProfile);
 router.put('/profile', protect, vendorOnly, updateVendorProfile);
 router.put('/location', protect, vendorOnly, updateLocation);
+router.put('/status', protect, vendorOnly, toggleStatus);
 
 // Upload KYC: Expects fields like 'aadhar', 'pan'
 router.post(

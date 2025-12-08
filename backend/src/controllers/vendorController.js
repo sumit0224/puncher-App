@@ -109,9 +109,29 @@ const uploadKYC = async (req, res) => {
     }
 };
 
+
+// @desc    Toggle vendor status (Online/Offline)
+// @route   PUT /api/vendors/status
+// @access  Private (Vendor)
+const toggleStatus = async (req, res) => {
+    try {
+        const vendor = await Vendor.findById(req.user.id);
+        if (!vendor) return res.status(404).json({ message: 'Vendor not found' });
+
+        vendor.isActive = !vendor.isActive;
+        await vendor.save();
+
+        res.json({ isActive: vendor.isActive });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 module.exports = {
     getVendorProfile,
     updateVendorProfile,
     updateLocation,
-    uploadKYC
+    uploadKYC,
+    toggleStatus
 };

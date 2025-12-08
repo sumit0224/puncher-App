@@ -5,15 +5,37 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 import ServiceRequestForm from '@/components/dashboard/ServiceRequestForm';
 import ActiveJobsList from '@/components/dashboard/ActiveJobsList';
 import { api } from '@/lib/api';
+import { useSocket } from '@/context/SocketContext';
 
 export default function UserDashboard() {
     const [jobs, setJobs] = useState([]);
     const [user, setUser] = useState<{ name: string } | null>(null);
 
+    const { socket } = useSocket();
+
     useEffect(() => {
         fetchUserProfile();
         fetchJobs();
     }, []);
+
+    useEffect(() => {
+        if (socket) {
+            socket.on('job_assigned', (job: any) => {
+                alert(`Good news! A mechanic has accepted your request: ${job.serviceType}`);
+                fetchJobs(); // Update the list
+            });
+
+            socket.on('job_status_update', (job: any) => {
+                alert(`Update on your request: Status is now ${job.status}`);
+                fetchJobs();
+            });
+
+            return () => {
+                socket.off('job_assigned');
+                socket.off('job_status_update');
+            };
+        }
+    }, [socket]);
 
     const fetchUserProfile = async () => {
         try {

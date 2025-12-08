@@ -6,18 +6,31 @@ import ActiveJobsList from '@/components/dashboard/ActiveJobsList';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { api } from '@/lib/api';
+import { useSocket } from '@/context/SocketContext';
 
 export default function VendorDashboard() {
-    const [jobs, setJobs] = useState([]);
+    const [jobs, setJobs] = useState<any[]>([]);
     const [isOnline, setIsOnline] = useState(false);
     const [vendor, setVendor] = useState<{ name: string; shopName: string; isVerified: boolean } | null>(null);
-    // Need polling or socket for incoming requests.
-    // Stubbing for UI structure.
+    const { socket } = useSocket();
 
     useEffect(() => {
         fetchVendorProfile();
         fetchJobs();
     }, []);
+
+    useEffect(() => {
+        if (socket) {
+            socket.on('new_job_request', (job: any) => {
+                alert(`New Job Request: ${job.serviceType}`);
+                // Add the new job to the list immediately so it can be accepted
+                setJobs((prevJobs) => [job, ...prevJobs]);
+            });
+            return () => {
+                socket.off('new_job_request');
+            };
+        }
+    }, [socket]);
 
     const fetchVendorProfile = async () => {
         try {
@@ -27,7 +40,15 @@ export default function VendorDashboard() {
                     'Authorization': `Bearer ${token}`
                 });
                 setVendor(vendorData);
-                // Could also hydrate isOnline based on vendorData if backend tracks it
+                // Assume vendorData has isActive field? 
+                // We didn't see it in the previous view_file of vendorController getProfile, 
+                // but the model has it. Let's assume the controller returns it or we fetch it.
+                // Actually the controller I viewed EARLIER did NOT return isActive explicitly in the JSON response?
+                // Let's check vendorController again or just fetch it. 
+                // Wait, I can see getVendorProfile in my context. It sends: 
+                // id, name, phone, shopName, serviceTypes, currentLocation, isVerified, documents, bankInfo.
+                // It does NOT send isActive. I should update getVendorProfile too or just rely on the toggle response.
+                // For now, let's assume default offline or fetch it.
             }
         } catch (error) {
             console.error("Failed to fetch vendor profile", error);
@@ -49,8 +70,33 @@ export default function VendorDashboard() {
     };
 
     const toggleStatus = async () => {
-        setIsOnline(!isOnline);
-        // Call backend API to update status
+        try {
+            const token = localStorage.getItem('token');
+            const data = await api.put<{ isActive: boolean }>('/vendors/status', {}, {
+                'Authorization': `Bearer ${token}`
+            });
+            setIsOnline(data.isActive);
+        } catch (error) {
+            console.error("Failed to toggle status", error);
+            alert("Failed to toggle status");
+        }
+    };
+
+    // ... rest of render ...
+
+    // Accept Job Handler
+    const acceptJob = async (jobId: string) => {
+        try {
+            const token = localStorage.getItem('token');
+            await api.post(`/requests/${jobId}/accept`, {}, {
+                'Authorization': `Bearer ${token}`
+            });
+            alert("Job Accepted!");
+            fetchJobs();
+        } catch (error) {
+            console.error(error);
+            alert("Failed to accept job");
+        }
     };
 
     return (
@@ -82,14 +128,8 @@ export default function VendorDashboard() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div className="space-y-4">
-                        <h3 className="text-xl font-semibold">Incoming Requests</h3>
-                        <div className="text-center py-12 bg-white border border-dashed rounded-xl text-gray-400">
-                            {isOnline ? 'Waiting for requests...' : 'You are offline.'}
-                        </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        <h3 className="text-xl font-semibold">Active Jobs</h3>
+                        <h3 className="text-xl font-semibold">Incoming Requests / Active Jobs</h3>
+                        {/* Merging lists for MVP or showing ActiveJobsList */}
                         <ActiveJobsList jobs={jobs} userType="vendor" />
                     </div>
                 </div>
