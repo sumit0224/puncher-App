@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
+import { api } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Users, Wrench, Briefcase, CheckCircle, AlertCircle, Clock, Zap } from "lucide-react";
 
@@ -28,15 +29,9 @@ export default function AdminDashboard() {
         };
 
         // In real app, implement auth token
-        fetch('http://localhost:5000/api/admin/stats', {
-            headers: {
-                'Authorization': 'Bearer YOUR_ADMIN_TOKEN'
-            }
+        api.get<DashboardStats>('/admin/stats', {
+            'Authorization': 'Bearer YOUR_ADMIN_TOKEN'
         })
-            .then((res) => {
-                if (!res.ok) throw new Error("Failed to fetch");
-                return res.json();
-            })
             .then((data) => setStats(data))
             .catch((err) => {
                 console.error(err);

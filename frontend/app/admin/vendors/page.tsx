@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
+import { api } from '@/lib/api';
 
 interface Vendor {
     id: number;
@@ -12,12 +13,9 @@ export default function VendorManagement() {
     const [vendors, setVendors] = useState<Vendor[]>([]);
 
     const fetchVendors = () => {
-        fetch('http://localhost:5000/api/admin/vendors?status=pending', {
-            headers: {
-                'Authorization': 'Bearer YOUR_ADMIN_TOKEN'
-            }
+        api.get<Vendor[]>('/admin/vendors?status=pending', {
+            'Authorization': 'Bearer YOUR_ADMIN_TOKEN' // In real app, use auth context
         })
-            .then((res) => res.json())
             .then((data) => setVendors(data))
             .catch((err) => console.error(err));
     };
@@ -27,19 +25,14 @@ export default function VendorManagement() {
     }, []);
 
     const verifyVendor = (id: number) => {
-        fetch(`http://localhost:5000/api/admin/vendors/${id}/verify`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer YOUR_ADMIN_TOKEN'
-            },
-            body: JSON.stringify({ isVerified: true })
+        api.put(`/admin/vendors/${id}/verify`, { isVerified: true }, {
+            'Authorization': 'Bearer YOUR_ADMIN_TOKEN'
         })
-            .then(res => res.json())
             .then(() => {
                 alert('Vendor Verified!');
                 fetchVendors(); // Refresh list
-            });
+            })
+            .catch(err => console.error(err));
     };
 
     return (
